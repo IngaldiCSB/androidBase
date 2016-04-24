@@ -1,4 +1,4 @@
-package it.csbeng.androidbase.tools;
+package it.csbeng.androidbase.androidbase.tools;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;

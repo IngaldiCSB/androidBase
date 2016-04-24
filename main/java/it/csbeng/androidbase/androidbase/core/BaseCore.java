@@ -2,7 +2,7 @@ package it.csbeng.androidbase.androidbase.core;
 
 import android.content.Context;
 
-import it.csbeng.androidbase.tools.BaseFuture;
+import it.csbeng.androidbase.androidbase.tools.BaseFuture;
 import java.util.concurrent.Future;
 
 /**
