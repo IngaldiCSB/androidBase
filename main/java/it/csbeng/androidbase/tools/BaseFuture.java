@@ -1,5 +1,6 @@
 package it.csbeng.androidbase.tools;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -10,38 +11,52 @@ import it.csbeng.androidbase.androidbase.core.BaseCore;
 /**
  * @author Carmine Ingaldi
  * @version 0.0.1
+ *
+ * @// TODO: 24/04/2016 future should not expose a "set" method. Only the future owner should resolve its value
+ *
  */
 public class BaseFuture<T> implements Future<T>
 {
-    private BaseCore called;
+    private BaseCore mProducer = null;
+    private T mValue = null;
+    private CountDownLatch mSemaphore = new CountDownLatch(1);
 
-    public BaseFuture(BaseCore called)
+    public BaseFuture(BaseCore producer)
     {
-        this.called = called;
+        this.mProducer = producer;
     }
 
     @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        return false;
+    public boolean cancel(boolean mayInterruptIfRunning)
+    {
+        throw new UnsupportedOperationException("implement BaseFuture");
     }
 
     @Override
     public boolean isCancelled() {
-        return false;
+        throw new UnsupportedOperationException("implement BaseFuture");
     }
 
     @Override
     public boolean isDone() {
-        return false;
+        throw new UnsupportedOperationException("implement BaseFuture");
     }
 
     @Override
     public T get() throws InterruptedException, ExecutionException {
-        return null;
+
+        mSemaphore.await();
+        return mValue;
     }
 
     @Override
     public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return null;
+        throw new UnsupportedOperationException("implement BaseFuture");
+    }
+
+    public void set(T value)
+    {
+        mValue = value;
+        mSemaphore.countDown();
     }
 }

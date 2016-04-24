@@ -10,7 +10,7 @@ import it.csbeng.androidbase.tools.BaseFuture;
 public abstract class BaseRunnableCore<INPUT , OUTPUT , ERROR> extends BaseCore implements Runnable , IBaseCore
 {
     private INPUT input;
-    private Thread mRunner = new Thread(this);
+    protected Thread mRunner = new Thread(this);
 
     public BaseRunnableCore(Context mContext) {
         super(mContext);

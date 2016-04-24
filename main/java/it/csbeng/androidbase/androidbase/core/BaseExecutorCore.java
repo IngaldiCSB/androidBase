@@ -2,12 +2,19 @@ package it.csbeng.androidbase.androidbase.core;
 
 import android.content.Context;
 
+import java.util.concurrent.BlockingQueue;
+
 /**
  * Created by gennaro on 24/04/2016.
  */
-public abstract class BaseExecutorCore <INPUT , OUTPUT , ERROR> extends BaseRunnableCore {
+public abstract class BaseExecutorCore <INPUT , OUTPUT , ERROR> extends BaseRunnableCore
+{
+    private BlockingQueue<INPUT> inputs;
 
-    public BaseExecutorCore(Context mContext) {
+    private boolean isStarted = false;
+
+    public BaseExecutorCore(Context mContext)
+    {
         super(mContext);
     }
 
@@ -25,4 +32,36 @@ public abstract class BaseExecutorCore <INPUT , OUTPUT , ERROR> extends BaseRunn
 
     @Override
     abstract void execute(Object o);
+
+    @Override
+    public void resolve(Object input)
+    {
+        if (!isStarted)
+        {
+            isStarted = true;
+            mRunner.start();
+        }
+
+        inputs.offer((INPUT)input);
+
+
+    }
+
+    @Override
+    public void run()
+    {
+
+        while (isStarted)
+        {
+            try
+            {
+                execute(inputs.take());
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+    }
 }
