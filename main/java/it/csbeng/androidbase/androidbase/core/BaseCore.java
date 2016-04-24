@@ -2,6 +2,9 @@ package it.csbeng.androidbase.androidbase.core;
 
 import android.content.Context;
 
+import it.csbeng.androidbase.tools.BaseFuture;
+import java.util.concurrent.Future;
+
 /**
  * @author Carmine Ingaldi
  * @version 0.0.1
@@ -16,12 +19,15 @@ import android.content.Context;
  * complex interaction among several etherogeneous components, then provide them proper listeners capable to
  * react to different results coming out from core execution</p>
  */
-public abstract class BaseCore<INPUT>
+public abstract class BaseCore<INPUT , OUTPUT , ERROR>
 {
     private IBaseListener mListener = new NILListener();
     private Context mContext = null;
 
-    private BaseCore<?> decorated = null;
+    private BaseCore<INPUT , OUTPUT , ERROR> decorated = null;
+    private BaseCore<INPUT , OUTPUT , ERROR> decorator = null;
+
+    private boolean resultProduced = false;
 
     public BaseCore(Context mContext)
     {
@@ -30,20 +36,19 @@ public abstract class BaseCore<INPUT>
 
     public BaseCore(Context context, IBaseListener listener)
     {
-        this.mContext = context;
+        this(context);
         this.mListener = listener;
     }
 
-    public BaseCore(Context context, BaseCore<?> decorated)
+    public BaseCore(Context context, BaseCore<INPUT , OUTPUT , ERROR> decorated)
     {
-        this.mContext = context;
+        this(context);
         this.decorated = decorated;
     }
 
-    public BaseCore(IBaseListener listener, Context context, BaseCore<?> decorated)
+    public BaseCore(IBaseListener listener, Context context, BaseCore<INPUT , OUTPUT , ERROR> decorated)
     {
-        this.mListener = listener;
-        this.mContext = context;
+        this(context, listener);
         this.decorated = decorated;
     }
 
@@ -52,13 +57,53 @@ public abstract class BaseCore<INPUT>
         mListener.onProgress(mContext , progressLevel , warningLevel);
     }
 
+    protected void notifyResult(OUTPUT output)
+    {
+        if (!resultProduced)
+        {
+            mListener.onResult(mContext , output);
+            resultProduced = true;
+        }
 
+        if(decorator != null)
+        {
+
+        }
+
+    }
+
+    protected void notifyError(ERROR error)
+    {
+        mListener.onError(mContext , error);
+    }
+
+
+    protected BaseFuture<?> next(INPUT input)
+    {
+        if (decorated != null)
+        {
+            decorated.execute(input);
+        }
+
+        return new BaseFuture<OUTPUT>(decorated);
+    }
 
     /**
      *
      * @param input
      */
-    public abstract void execute (INPUT input );
+    abstract void execute (INPUT input );
+
+    public  void resolve (INPUT input)
+    {
+        execute(input);
+    }
+
+    public void dispose ()
+    {
+        //Nothing to to here!;
+    }
+
 
     interface IBaseListener <OUTPUT , ERROR>
     {
