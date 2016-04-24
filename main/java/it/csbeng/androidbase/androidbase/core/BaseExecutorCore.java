@@ -5,7 +5,12 @@ import android.content.Context;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * Created by gennaro on 24/04/2016.
+ * @author Carmine Ingaldi
+ * @version 0.0.1
+ *
+ * This abstraction is slightly different from {@link BaseRunnableCore} because implements a real
+ * event loop. Prefer it when you have to process a stream of data in a different thread, saving the
+ * overhead needed to create and destroy a new thread each time a new computation is done
  */
 public abstract class BaseExecutorCore <INPUT , OUTPUT , ERROR> extends BaseRunnableCore
 {

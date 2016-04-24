@@ -117,11 +117,17 @@ public abstract class BaseCore<INPUT , OUTPUT , ERROR>
 
 
     /**
-     *
+     *This is the most important method of the BaseCore class. Here you have to put your own logic, interact with other cores and
+     * emit events. Keep in mind that cores are meant to be disposable, so you should not execute it twice in the same context (but I admit that
+     * some exception could be reasonable)
      * @param input
      */
     abstract void execute (INPUT input );
 
+    /**
+     * Causes the core exectution
+     * @param input
+     */
     public  void resolve (INPUT input)
     {
         this.resultProduced = false;

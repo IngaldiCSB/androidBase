@@ -5,7 +5,11 @@ import android.content.Context;
 import it.csbeng.androidbase.tools.BaseFuture;
 
 /**
- * Created by gennaro on 24/04/2016.
+ * @author Carmine Ingaldi
+ * @version 0.0.1
+ *
+ * This abstraction provides an utility to implement cores that run in a different thread. Think about it like an
+ * {@link android.os.AsyncTask} that returns something to the caller when notifyXXX() methods are called within
  */
 public abstract class BaseRunnableCore<INPUT , OUTPUT , ERROR> extends BaseCore implements Runnable , IBaseCore
 {
