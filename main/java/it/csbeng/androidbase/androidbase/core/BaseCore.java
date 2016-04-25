@@ -155,9 +155,10 @@ public abstract class BaseCore<INPUT , OUTPUT , ERROR> extends Observable
      *  in then()'s argument will be exectued only after that the preceiding core has issued the onResult() method
      * @param thenCore
      */
-    public void then (BaseCore thenCore)
+    public BaseCore then (BaseCore thenCore)
     {
         chained = thenCore;
+        return chained;
     }
 
     public void dispose ()
@@ -166,7 +167,7 @@ public abstract class BaseCore<INPUT , OUTPUT , ERROR> extends Observable
     }
 
 
-    interface IBaseListener <OUTPUT , ERROR>
+    public interface IBaseListener <OUTPUT , ERROR>
     {
         /**
          *Implement logic that reacts to progress events emitted from your core.
