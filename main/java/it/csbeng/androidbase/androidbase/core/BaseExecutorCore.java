@@ -36,7 +36,7 @@ public abstract class BaseExecutorCore <INPUT , OUTPUT , ERROR> extends BaseRunn
     }
 
     @Override
-    abstract void execute(Object o);
+    protected abstract void execute(Object o);
 
     @Override
     public void resolve(Object input)

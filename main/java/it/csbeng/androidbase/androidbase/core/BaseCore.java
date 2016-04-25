@@ -1,8 +1,12 @@
 package it.csbeng.androidbase.androidbase.core;
 
 import android.content.Context;
+import android.os.Handler;
 
+import it.csbeng.androidbase.androidbase.tools.BaseCallback;
 import it.csbeng.androidbase.androidbase.tools.BaseFuture;
+
+import java.util.Observable;
 import java.util.concurrent.Future;
 
 /**
@@ -19,15 +23,16 @@ import java.util.concurrent.Future;
  * complex interaction among several etherogeneous components, then provide them proper listeners capable to
  * react to different results coming out from core execution</p>
  */
-public abstract class BaseCore<INPUT , OUTPUT , ERROR>
+public abstract class BaseCore<INPUT , OUTPUT , ERROR> extends Observable
 {
     private IBaseListener mListener = new NILListener();
     private Context mContext = null;
 
     private BaseCore<INPUT , OUTPUT , ERROR> decorated = null;
+    private BaseCore<OUTPUT , ? , ?> chained = null;
 
     private boolean resultProduced = false;
-    private Future<OUTPUT> result = new BaseFuture<>(this);
+    private Future<OUTPUT> result = new BaseFuture<OUTPUT>(this);
 
     public BaseCore(Context mContext)
     {
@@ -57,6 +62,7 @@ public abstract class BaseCore<INPUT , OUTPUT , ERROR>
         return result;
     }
 
+
     protected void notifyProgress (int progressLevel , int warningLevel)
     {
         mListener.onProgress(mContext , progressLevel , warningLevel);
@@ -74,10 +80,17 @@ public abstract class BaseCore<INPUT , OUTPUT , ERROR>
     {
         if (!resultProduced)
         {
-            mListener.onResult(mContext , output);
-            ((BaseFuture) result).set(output);
+            mListener.onResult(mContext, output);
+
+            setChanged();
+            notifyObservers(output);
 
             resultProduced = true;
+
+            if (chained != null)
+            {
+                chained.execute(output);
+            }
         }
 
     }
@@ -122,7 +135,7 @@ public abstract class BaseCore<INPUT , OUTPUT , ERROR>
      * some exception could be reasonable)
      * @param input
      */
-    abstract void execute (INPUT input );
+    protected abstract void execute(INPUT input);
 
     /**
      * Causes the core exectution
@@ -144,7 +157,7 @@ public abstract class BaseCore<INPUT , OUTPUT , ERROR>
      */
     public void then (BaseCore thenCore)
     {
-        throw new UnsupportedOperationException("implement then method in BaseCore!!!");
+        chained = thenCore;
     }
 
     public void dispose ()
@@ -183,6 +196,7 @@ public abstract class BaseCore<INPUT , OUTPUT , ERROR>
          *                  error conditions that the listener implementor could face
          */
          void onError (Context context  , ERROR errorData);
+
 
     }
 

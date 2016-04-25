@@ -1,5 +1,7 @@
 package it.csbeng.androidbase.androidbase.tools;
 
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -15,7 +17,7 @@ import it.csbeng.androidbase.androidbase.core.BaseCore;
  * @// TODO: 24/04/2016 future should not expose a "set" method. Only the future owner should resolve its value
  *
  */
-public class BaseFuture<T> implements Future<T>
+public class BaseFuture<T> implements Future<T>, Observer
 {
     private BaseCore mProducer = null;
     private T mValue = null;
@@ -24,6 +26,7 @@ public class BaseFuture<T> implements Future<T>
     public BaseFuture(BaseCore producer)
     {
         this.mProducer = producer;
+        producer.addObserver(this);
     }
 
     @Override
@@ -54,9 +57,15 @@ public class BaseFuture<T> implements Future<T>
         throw new UnsupportedOperationException("implement BaseFuture");
     }
 
-    public void set(T value)
+    protected void set(T value)
     {
-        mValue = value;
+
+    }
+
+    @Override
+    public void update(Observable observable, Object data)
+    {
+        mValue = (T) data;
         mSemaphore.countDown();
     }
 }

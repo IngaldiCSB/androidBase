@@ -58,7 +58,7 @@ public abstract class BaseRunnableCore<INPUT , OUTPUT , ERROR> extends BaseCore 
         execute(input);
     }
 
-    abstract void execute(Object o);
+    protected abstract void execute(Object o);
 
     @Override
     public void resolve(Object input)
