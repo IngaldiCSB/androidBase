@@ -17,16 +17,13 @@ import it.csbeng.androidbase.androidbase.core.BaseCore;
  * @// TODO: 24/04/2016 future should not expose a "set" method. Only the future owner should resolve its value
  *
  */
-public class BaseFuture<T> implements Future<T>, Observer
+public class BaseFuture<T> implements Future<T>
 {
-    private BaseCore mProducer = null;
-    private T mValue = null;
-    private CountDownLatch mSemaphore = new CountDownLatch(1);
+    private FutureValue<T> value;
 
-    public BaseFuture(BaseCore producer)
+    public BaseFuture(FutureValue<T> value)
     {
-        this.mProducer = producer;
-        producer.addObserver(this);
+        this.value = value;
     }
 
     @Override
@@ -46,10 +43,17 @@ public class BaseFuture<T> implements Future<T>, Observer
     }
 
     @Override
-    public T get() throws InterruptedException, ExecutionException {
-
-        mSemaphore.await();
-        return mValue;
+    public T get()
+    {
+        try
+        {
+            return value.getValue();
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -57,17 +61,6 @@ public class BaseFuture<T> implements Future<T>, Observer
         throw new UnsupportedOperationException("implement BaseFuture");
     }
 
-    protected void set(T value)
-    {
-
-    }
-
-    @Override
-    public void update(Observable observable, Object data)
-    {
-        mValue = (T) data;
-        mSemaphore.countDown();
-    }
 
     /**
      * Utility method that you can use to compare tow futures. Since their values should be resolved in some point of time and you
@@ -80,6 +73,24 @@ public class BaseFuture<T> implements Future<T>, Observer
     public static BaseFuture<Boolean> compare (Future<? extends Comparable> a , Future<? extends Comparable> b , BaseFuture.CompareMode mode)
     {
         throw new UnsupportedOperationException("implement compare in BaseFuture!!!");
+    }
+
+    public static class FutureValue<T>
+    {
+        private T mValue = null;
+        private CountDownLatch mSemaphore = new CountDownLatch(1);
+
+        private T getValue() throws InterruptedException
+        {
+            mSemaphore.await();
+            return mValue;
+        }
+
+        public void setValue(T mValue)
+        {
+            this.mValue = mValue;
+            mSemaphore.countDown();
+        }
     }
 
     public enum CompareMode

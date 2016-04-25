@@ -32,7 +32,8 @@ public abstract class BaseCore<INPUT , OUTPUT , ERROR> extends Observable
     private BaseCore<OUTPUT , ? , ?> chained = null;
 
     private boolean resultProduced = false;
-    private Future<OUTPUT> result = new BaseFuture<OUTPUT>(this);
+    private BaseFuture.FutureValue futureValue = new BaseFuture.FutureValue();
+    private Future<OUTPUT> result = new BaseFuture<OUTPUT>(futureValue);
 
     public BaseCore(Context mContext)
     {
@@ -81,9 +82,7 @@ public abstract class BaseCore<INPUT , OUTPUT , ERROR> extends Observable
         if (!resultProduced)
         {
             mListener.onResult(mContext, output);
-
-            setChanged();
-            notifyObservers(output);
+            futureValue.setValue(output);
 
             resultProduced = true;
 
